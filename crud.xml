@@ -1,0 +1,4015 @@
+<fmxmlsnippet type="FMObjectList">
+  <Step enable="True" id="89" name="Comment">
+    <Text>Description: &#13;&#13;Primary Create, Read, Update, Delete, Find script.</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Parameters:&#13;&#13;TableName ( or TableID )&#13;Method (C, R, U, D, F, V)&#13;KeyFieldValue&#13;ReadFieldList (return-separated list of human name fields to return)&#13;UpdateDict (dictionary of human names and values)&#13;SearchRequests (dictionary of find requests)</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Version 1.7 ( LOCKED as of 2011-11-28, 5:04 PM - phillips )</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CONSTANTS&#13;CONSTANTS&#13;CONSTANTS&#13;CONSTANTS&#13;CONSTANTS&#13;CONSTANTS &#13;</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CONSTANTS CONSTANTS CONSTANTS CONSTANTS CONSTANTS CONSTANTS &#13;</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>These variables are set here for internal programming purposes. Not modified by incoming parameters.</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA["[PrimaryKey]"      // The label to use as key in dictionaries where the value will be the key field value.]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$primaryKey_LABEL</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA["_CRUD"      // The Suffix to be used for all CRUD layouts.]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$layoutNameSuffix</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[False]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$DEBUGMODE</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Set parameters to variables.</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Get ( ScriptParameter )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$params</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $params ; "CRUD" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$params</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="True"></Set>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictToJSON ( $params ; "" ) // THIS IS SET TO MAKE DEBUGGING EASIER.]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$paramsAsJSON</Name>
+  </Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="False"></Set>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictToVariables ( $params )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$varsCreated</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Method - The method function being requested.&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>TableName - The name of the target table. To be used as an alternative to TableID, since TableID will not break if the table is renamed.&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>TableID - The ID of the target table.&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>ReadFieldList - A carriage-return separated list of human field names to be returned from the script&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>OR a single-item dictionary with the key &quot;ALL&quot; and a value True to indicate reading all available criteria.&#13;&#13;| &#13;Author: shockley &#13;Date: 11/17/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>UpdateDict - A dictionary of fields and values to be updated&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>SearchRequests - A dictionary of Request Dictionaries, allowing you to perform multiple search requests&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>UseFoundSet - Use the current found set instead of performing a find.&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>UpdateMultiple - Allows the script to perform the update function across multiple records. Needs to be called explicitly to avoid unwanted updates.&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>DeleteMultiple - Allows the script to perform the delete function across multiple records. Needs to be called explicitly to avoid unwanted deletes.&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>ShowDialogs - Will show any dialogs with notifications or errors&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>NoCommit - Will make sure that the record is not committed until the update function runs. Used almost exclusively in the Create function to allow an update to run before the record is updated with required fields to ensure passing record validation.&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>UseWindowName - A window to use, rather than creating a new utility window. Especially used when Find is being called as a subscript of a parent CRUDFV script.&#13;&#13;| &#13;Author: shockley &#13;Date: 11/16/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>ViewDict - A dictionary containing all of the options for the resulting view that can be configured. See documentation for full list&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>KeyFieldValue - If the SearchRequests variable contains one key called &quot;[PrimaryKey]&quot; (see $primaryKey_LABEL for the string) in lieu of one or more called &quot;Request&quot;, set this variable to that value. &#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $SearchRequests ; $primaryKey_LABEL )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$KeyFieldValue</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Check for required parameters</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If the TableName or Method parameters are null, exit the script.&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[IsEmpty ( $Table ) or
+IsEmpty ( $Method ) or
+IsEmpty ( $KeyField )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "Not all of the necessary parameters were passed.  Please contact your database administrator." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$ShowDialogs]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="87" name="Show Custom Dialog">
+    <Title>
+      <Calculation>
+        <![CDATA[DictGet ( $result ; "Result" )]]>
+</Calculation>
+    </Title>
+    <Message>
+      <Calculation>
+        <![CDATA["File: " & DictGet ( $result ; "FileName" ) & "¶" 
+& "Script: " & DictGet ( $result ; "ScriptName" ) & "¶" 
+& "Result: " & DictGet ( $result ; "ResultDescription" )]]>
+</Calculation>
+    </Message>
+    <ButtonCaptions>
+      <ButtonCaption>OK</ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+    </ButtonCaptions>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[PatternCount ( "CRUDFV" ; $Method ) = 0]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "Invalid method specified.  Please contact your database administrator." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$ShowDialogs]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="87" name="Show Custom Dialog">
+    <Title>
+      <Calculation>
+        <![CDATA[DictGet ( $result ; "Result" )]]>
+</Calculation>
+    </Title>
+    <Message>
+      <Calculation>
+        <![CDATA["File: " & DictGet ( $result ; "FileName" ) & "¶" 
+& "Script: " & DictGet ( $result ; "ScriptName" ) & "¶" 
+& "Result: " & DictGet ( $result ; "ResultDescription" )]]>
+</Calculation>
+    </Message>
+    <ButtonCaptions>
+      <ButtonCaption>OK</ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+    </ButtonCaptions>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Convert any ID parameters into names</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Check to see if a table &#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[GetAsText ( GetAsNumber ( $Table ) ) ≠ $Table]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[FM_Name_ID ( $Table ; "T" ; Get ( FileName ) ; "" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$Table</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Find the name of the key field for the specified table</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[GetAsText ( GetAsNumber ( $KeyField ) ) ≠ $KeyField]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[FM_Name_ID ( $KeyField ; "F" ; Get ( FileName ) ; $Table )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$KeyField</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[IsEmpty ( $KeyField )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "Could not get the Key Field for the table '" & $TableName & "', so the operation could not proceed. ERROR: " & #R( "ResultDescription" ) & "." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[   FM_Name_ID ( $Table ; "T" ; Get ( FileName ) ; "" )  
+& "::" 
+& FM_Name_ID ( $KeyField ; "F" ; Get ( FileName ) ; $Table )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$keyFieldName</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[( 
+  $Method = "V"
+   and 
+  True ≠ GetAsBoolean( DictGet ( $ViewDict ; "NewWindow" ) ) 
+) 
+
+ or   
+
+not IsEmpty( $UseWindowName )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Only reasons to NOT make a New Window are as follows:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>This is a VIEW command, the View params explicitly SAY NewWindow=False, or don&apos;t bother to say either way (i.e. default is FALSE for a View),</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>OR UseWindowName IS specified:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Make a new utility window for this search, UNLESS there is a ViewDict with NewWindow NOT specified OR explicitly set to FALSE (default for View is FALSE). Also, do NOT create a window if the one to use was specified.</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>NEW WINDOW NEW WINDOW NEW WINDOW NEW WINDOW NEW WINDOW NEW WINDOW</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>NEW WINDOW NEW WINDOW NEW WINDOW NEW WINDOW NEW WINDOW NEW WINDOW</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>NEW WINDOW NEW WINDOW NEW WINDOW NEW WINDOW NEW WINDOW NEW WINDOW</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Get( WindowTop )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$prevWindowTop</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Get( WindowLeft )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$prevWindowLeft</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Get( WindowWidth )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$prevWindowWidth</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Get( WindowHeight )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$prevWindowHeight</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "NewWindow" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$NewWindow</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$NewWindow]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>New Window WILL be desired in the View, so put this in the typical spot as default.</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Make new window, just allowing defaults for a new window - these may be changed in the VIEW section:</Text>
+  </Step>
+  <Step enable="True" id="122" name="New Window"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>IF this is JUST going to be used as a hidden utility window, make it small and off-screen:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA["TEMPWIN " & Random & " " & Get( CurrentHostTimeStamp )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$WindowName_TEMP</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="122" name="New Window">
+    <Name>
+      <Calculation>
+        <![CDATA[$WindowName_TEMP]]>
+</Calculation>
+    </Name>
+    <Height>
+      <Calculation>
+        <![CDATA[300]]>
+</Calculation>
+    </Height>
+    <Width>
+      <Calculation>
+        <![CDATA[300]]>
+</Calculation>
+    </Width>
+    <DistanceFromTop>
+      <Calculation>
+        <![CDATA[-9999]]>
+</Calculation>
+    </DistanceFromTop>
+    <DistanceFromLeft>
+      <Calculation>
+        <![CDATA[-9999]]>
+</Calculation>
+    </DistanceFromLeft>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Find either the blank or the basic layout to perform the functions on.</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If a layout was specified in $DestinationLayoutName, it will be navigated to after all processes have been executed&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Go to the layout that matches the string &quot;&lt;&lt;TableName&gt;&gt; Blank&quot;&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="6" name="Go to Layout">
+    <LayoutDestination value="LayoutNameByCalc"></LayoutDestination>
+    <Layout id="0" name="">
+      <Calculation>
+        <![CDATA[$TableName & " Blank"]]>
+</Calculation>
+    </Layout>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[Get( LastError ) = 105]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If that layout doesn&apos;t exist, try &quot;&lt;&lt;TableName&gt;&gt; Basic&quot;&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="6" name="Go to Layout">
+    <LayoutDestination value="LayoutNameByCalc"></LayoutDestination>
+    <Layout id="0" name="">
+      <Calculation>
+        <![CDATA[$TableName & " Basic"]]>
+</Calculation>
+    </Layout>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[Get( LastError ) = 105]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If that doesn&apos;t work, loop over all layouts to find one that is based on the TableName&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[ValueCount( LayoutNames ( Get( FileName) ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$loopMax</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[Let ( $loopIndex = $loopIndex + 1 ; $loopIndex > $loopMax )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="6" name="Go to Layout">
+    <LayoutDestination value="LayoutNumberByCalc"></LayoutDestination>
+    <Layout id="0" name="">
+      <Calculation>
+        <![CDATA[$loopIndex]]>
+</Calculation>
+    </Layout>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[Get( LayoutTableName ) = FM_Name_ID ( $Table ; "T" ; Get ( FileName ) ; "" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[1]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$loopIndex > $loopMax]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Could NOT find a layout for the specified Table, so return ERROR:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "No layout was found for the specified Table '" & $TableName & "', so the operation could not proceed." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$ShowDialogs]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="87" name="Show Custom Dialog">
+    <Title>
+      <Calculation>
+        <![CDATA[DictGet ( $result ; "Result" )]]>
+</Calculation>
+    </Title>
+    <Message>
+      <Calculation>
+        <![CDATA["File: " & DictGet ( $result ; "FileName" ) 
+& "¶" 
+& "Script: " & DictGet ( $result ; "ScriptName" ) 
+& "¶" 
+& "Result: " & DictGet ( $result ; "ResultDescription" )]]>
+</Calculation>
+    </Message>
+    <ButtonCaptions>
+      <ButtonCaption>OK</ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+    </ButtonCaptions>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Find Record if method is not C</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If any other method than &quot;C&quot; is called, you&apos;re going to need to find the record that is either being Read, Updated or Deleted, so find based on the KeyField and KeyFieldValue&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$Method ≠ "C" and not $NoCommit and not $UseFoundSet]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[not DictContains ( $SearchRequests ; "MultiRequest" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $SearchRequests ; "MultiRequest" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$MultiRequest</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictRemove ( $SearchRequests ; "MultiRequest" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$SearchRequests</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $MultiRequest ; "[FieldTitle]" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$MultiRequest_fieldTitle</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $MultiRequest ; "[ListOfValues]" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$MultiRequest_listOfValues</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictRemove ( DictRemove ( $MultiRequest ; "[FieldTitle]" ) ; "[ListOfValues]" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$MultiRequest</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[ValueCount ( $MultiRequest_listOfValues )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$CountOfValuesInList</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$MultiRequest_ListOfValues]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$MultiRequest_ListOfValues_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[IsEmpty ( $MultiRequest_ListOfValues_ReadTemp )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[GetValue ( $MultiRequest_ListOfValues_ReadTemp ; 1 )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ValueForRequest</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[MiddleValues ( $MultiRequest_ListOfValues_ReadTemp ; 2 ; ValueCount ( $MultiRequest_ListOfValues_ReadTemp ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$MultiRequest_ListOfValues_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( $MultiRequest_fieldTitle ; $ValueForRequest )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$RequestToAdd_Params</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictListKeys ( $MultiRequest )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ListExtraKeys</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[IsEmpty ( $ListExtraKeys )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[GetValue ( $ListExtraKeys ; 1 )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$KeyToAppend</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[MiddleValues ( $ListExtraKeys ; 2 ; ValueCount ( $ListExtraKeys ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ListExtraKeys</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$RequestToAdd_Params & # ( $KeyToAppend ; DictGet ( $MultiRequest ; $KeyToAppend ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$RequestToAdd_Params</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$SearchRequests & # ( "Request" ; $RequestToAdd_Params )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$SearchRequests</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[not IsEmpty( $KeyFieldValue )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>a KEY FIELD VALUE was specified, so just use that for the Find:</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$KeyFieldValue = GetField( $keyFieldName )   and Get( FoundCount ) = 1]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>We are ALREADY on the specified record (and ONLY it is in found set), so do not run a Find.</Text>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="22" name="Enter Find Mode">
+    <Pause state="False"></Pause>
+    <Restore state="False"></Restore>
+  </Step>
+  <Step enable="True" id="147" name="Set Field By Name">
+    <Result>
+      <Calculation>
+        <![CDATA["==" & $KeyFieldValue]]>
+</Calculation>
+    </Result>
+    <TargetName>
+      <Calculation>
+        <![CDATA[$keyFieldName]]>
+</Calculation>
+    </TargetName>
+  </Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="True"></Set>
+  </Step>
+  <Step enable="True" id="28" name="Perform Find">
+    <Restore state="False"></Restore>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If the find didn&apos;t run successfully (i.e. an error other than no records found was encountered)</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[Get ( LastError ) ≠ 0 and Get ( LastError ) ≠ 401]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Exit without dialog</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; ErrorCode ( Get ( LastError ) ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="False"></Set>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="125" name="Else If">
+    <Calculation>
+      <![CDATA[DictContains ( $SearchRequests ; "Request" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If at least one request dictionary was defined (if SearchRequests used [PrimaryKey], that is handled above).</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="22" name="Enter Find Mode">
+    <Pause state="False"></Pause>
+    <Restore state="False"></Restore>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Generate the finds&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Loop over all search requests&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$SearchRequests]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$SearchRequests_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Grab the first request dictionary&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $SearchRequests_ReadTemp ; "Request" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$Request</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Remove the grabbed request from the dictionary of requests&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictRemove ( $SearchRequests_ReadTemp ; "Request" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$SearchRequests_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Loop over each of the criteria in the request&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$Request]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$RequestDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( GetValue ( DictListKeys ( $RequestDictList_ReadTemp ) ; 1 ) ; DictGet ( $RequestDictList_ReadTemp ; GetValue ( DictListKeys ( $RequestDictList_ReadTemp ) ; 1 ) ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$RequestDictItem</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictRemove ( $RequestDictList_ReadTemp ; GetValue ( DictListKeys ( $RequestDictList_ReadTemp ) ; 1 ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$RequestDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Set the fields while in find mode&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="147" name="Set Field By Name">
+    <Result>
+      <Calculation>
+        <![CDATA[DictGet ( $Request ; DictListKeys ( $RequestDictItem ) )]]>
+</Calculation>
+    </Result>
+    <TargetName>
+      <Calculation>
+        <![CDATA[FM_Name_ID ( $Table ; "T" ; Get ( FileName ) ; "" ) & "::" & DictListKeys ( $RequestDictItem )]]>
+</Calculation>
+    </TargetName>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Exit when there are no more fields to be set in the request&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[IsEmpty ( $RequestDictList_ReadTemp )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[DictGet ( $Request ; "Omit" ) = 1]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="25" name="Omit Record"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[not DictContains ( $SearchRequests_ReadTemp ; "Request" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="7" name="New Record/Request"></Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[not IsEmpty( $result )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If there is a $result defined, then we should skip to the end of the script - to the Clean-up Section.</Text>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="True"></Set>
+  </Step>
+  <Step enable="True" id="28" name="Perform Find">
+    <Restore state="False"></Restore>
+  </Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="False"></Set>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If the find didn&apos;t run successfully (i.e. an error other than no records found was encountered)</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[Get ( LastError ) ≠ 0 and Get ( LastError ) ≠ 401]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Exit without dialog</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; ErrorCode ( Get ( LastError ) ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="False"></Set>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Check resulting found count</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[Get ( FoundCount ) = 0]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If no records were found</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Exit with dialog</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "No records were found." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$ShowDialogs]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="87" name="Show Custom Dialog">
+    <Title>
+      <Calculation>
+        <![CDATA[DictGet ( $result ; "Result" )]]>
+</Calculation>
+    </Title>
+    <Message>
+      <Calculation>
+        <![CDATA[DictGet ( $result ; "FileName" ) & "¶"
+& DictGet ( $result ; "ScriptName" ) & "¶"
+& DictGet ( $result ; "ResultDescription" )]]>
+</Calculation>
+    </Message>
+    <ButtonCaptions>
+      <ButtonCaption>OK</ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+    </ButtonCaptions>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="125" name="Else If">
+    <Calculation>
+      <![CDATA[$UseFoundSet]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Explicitly specified to just USE FOUND SET, so do no Find:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>nothing here, as it should be</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>no Search method specified AT ALL = ERROR?</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "No search method of any type was specified." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$ShowDialogs]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="87" name="Show Custom Dialog">
+    <Title>
+      <Calculation>
+        <![CDATA[DictGet ( $result ; "Result" )]]>
+</Calculation>
+    </Title>
+    <Message>
+      <Calculation>
+        <![CDATA[DictGet ( $result ; "FileName" ) & "¶"
+& DictGet ( $result ; "ScriptName" ) & "¶"
+& DictGet ( $result ; "ResultDescription" )]]>
+</Calculation>
+    </Message>
+    <ButtonCaptions>
+      <ButtonCaption>OK</ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+      <ButtonCaption></ButtonCaption>
+    </ButtonCaptions>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CHECK FOUND COUNT CHECK FOUND COUNT CHECK FOUND COUNT CHECK FOUND COUNT CHECK FOUND COUNT</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CHECK FOUND COUNT CHECK FOUND COUNT CHECK FOUND COUNT CHECK FOUND COUNT CHECK FOUND COUNT</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CHECK FOUND COUNT CHECK FOUND COUNT CHECK FOUND COUNT CHECK FOUND COUNT CHECK FOUND COUNT</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[Get ( FoundCount ) = 0]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If no records were found</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Exit with dialog</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "No records were found." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="125" name="Else If">
+    <Calculation>
+      <![CDATA[( Get ( FoundCount ) > 1  and $Method = "D" and not $DeleteMultiple ) 
+  or  
+( Get( FoundCount ) > 1 and $Method = "U" and not $UpdateMultiple )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If more than one record was found, and we are trying to Delete or Update (without explicitly asking to work on multiple records):</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Exit with ERROR:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "More than one record was found." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$Method = "F"]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND FIND</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If we are only performing the F function, exit&#13;&#13;| &#13;Author: phillips &#13;Date: 11/9/2011</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Success" ) & 
+# ( "ResultDescription" ; "Records were found" ) &
+# ( "FoundCount" ; Get ( FoundCount ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$Method = "V"]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Set variables from all of the ViewParameterDict Items&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "DestinationLayoutID" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$DestinationLayoutID</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "DestinationLayoutName" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$DestinationLayoutName</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "NewWindow" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$NewWindow</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "WindowAlignCenter" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$WindowAlignCenter</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "WindowAlignLeft" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$WindowAlignLeft</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "WindowAlignRight" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$WindowAlignRight</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "WindowCascade" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$WindowCascade</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "ResizeToFit" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ResizeToFit</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "WindowAlignTop" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$WindowAlignTop</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "StatusAreaShow" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$StatusAreaShow</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "StatusAreaHide" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$StatusAreaHide</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $ViewDict ; "WindowTitle" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$WindowTitle</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If DestinationLayoutName is not set, grab the layout name using the DestinationLayoutID parameter &#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[IsEmpty ( $DestinationLayoutName )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[FM_Name_ID ( $DestinationLayoutID ; "L" ; Get ( FileName ) ; "" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$DestinationLayoutName</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>DISABLED: There WILL already be a new window, unless it was explicitly FALSE, so just use that. &#13;&#13;| &#13;Author: shockley &#13;Date: 11/16/2011</Text>
+  </Step>
+  <Step enable="False" id="89" name="Comment">
+    <Text>If NewWindow is true (and wasn&apos;t already opened by utility script)&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="False" id="68" name="If">
+    <Calculation>
+      <![CDATA[$NewWindow and IsEmpty( $WindowName_TEMP )]]>
+</Calculation>
+  </Step>
+  <Step enable="False" id="122" name="New Window"></Step>
+  <Step enable="False" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If WindowTitle is true&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[not IsEmpty ( $WindowTitle )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="124" name="Set Window Title">
+    <LimitToWindowsOfCurrentFile state="True"></LimitToWindowsOfCurrentFile>
+    <Window value="Current"></Window>
+    <NewName>
+      <Calculation>
+        <![CDATA[$WindowTitle]]>
+</Calculation>
+    </NewName>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Go to the layout specified&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="6" name="Go to Layout">
+    <LayoutDestination value="LayoutNameByCalc"></LayoutDestination>
+    <Layout id="0" name="">
+      <Calculation>
+        <![CDATA[$DestinationLayoutName]]>
+</Calculation>
+    </Layout>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[Get ( LastError ) ≠ 0]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Exit without dialog</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; ErrorCode ( Get ( LastError ) ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If StatusAreaShow is true&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$StatusAreaShow]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="29" name="Show/Hide Status Area">
+    <Lock state="False"></Lock>
+    <ShowHide value="Show"></ShowHide>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If StatusAreaHide is true&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$StatusAreaHide]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="29" name="Show/Hide Status Area">
+    <Lock state="False"></Lock>
+    <ShowHide value="Hide"></ShowHide>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If ResizeToFit is true&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$ResizeToFit]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="31" name="Adjust Window">
+    <WindowState value="ResizeToFit"></WindowState>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If WindowAlignTop is true&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$WindowAlignTop]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="119" name="Move/Resize Window">
+    <LimitToWindowsOfCurrentFile state="True"></LimitToWindowsOfCurrentFile>
+    <Window value="Current"></Window>
+    <DistanceFromTop>
+      <Calculation>
+        <![CDATA[0]]>
+</Calculation>
+    </DistanceFromTop>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If WindowAlignLeft is true&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$WindowAlignLeft]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="119" name="Move/Resize Window">
+    <LimitToWindowsOfCurrentFile state="True"></LimitToWindowsOfCurrentFile>
+    <Window value="Current"></Window>
+    <DistanceFromLeft>
+      <Calculation>
+        <![CDATA[0]]>
+</Calculation>
+    </DistanceFromLeft>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If WindowAlignRight is true&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$WindowAlignRight]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="119" name="Move/Resize Window">
+    <LimitToWindowsOfCurrentFile state="True"></LimitToWindowsOfCurrentFile>
+    <Window value="Current"></Window>
+    <DistanceFromLeft>
+      <Calculation>
+        <![CDATA[Get ( ScreenWidth ) - Get ( WindowWidth )]]>
+</Calculation>
+    </DistanceFromLeft>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If WindowAlignCenter is true&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$WindowAlignCenter]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="119" name="Move/Resize Window">
+    <LimitToWindowsOfCurrentFile state="True"></LimitToWindowsOfCurrentFile>
+    <Window value="Current"></Window>
+    <DistanceFromLeft>
+      <Calculation>
+        <![CDATA[( Get ( ScreenWidth ) / 2 ) - ( Get ( WindowWidth ) / 2 )]]>
+</Calculation>
+    </DistanceFromLeft>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If WindowCascade is true&#13;&#13;| &#13;Author: phillips &#13;Date: 11/10/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$WindowCascade]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="119" name="Move/Resize Window">
+    <LimitToWindowsOfCurrentFile state="True"></LimitToWindowsOfCurrentFile>
+    <Window value="Current"></Window>
+    <DistanceFromTop>
+      <Calculation>
+        <![CDATA[Get ( WindowTop ) + 22]]>
+</Calculation>
+    </DistanceFromTop>
+    <DistanceFromLeft>
+      <Calculation>
+        <![CDATA[Get ( WindowLeft ) + 22]]>
+</Calculation>
+    </DistanceFromLeft>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If we are only performing the F function, exit&#13;&#13;| &#13;Author: phillips &#13;Date: 11/9/2011</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Success" ) & 
+# ( "ResultDescription" ; "Records were found" ) &
+# ( "FoundCount" ; Get ( FoundCount ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$Method = "C"]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CREATE CREATE CREATE CREATE CREATE CREATE CREATE CREATE</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CREATE CREATE CREATE CREATE CREATE CREATE CREATE CREATE</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CREATE CREATE CREATE CREATE CREATE CREATE CREATE CREATE</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>First, make sure we have no records in found set to start with:</Text>
+  </Step>
+  <Step enable="True" id="23" name="Show All Records"></Step>
+  <Step enable="True" id="27" name="Show Omitted Only"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Create the record&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="7" name="New Record/Request"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Grab the key field value&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Evaluate ( $KeyFieldName )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$NewRecKeyFieldValue</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Run this script as an Update to set all fields with any values passed in for the new record&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[not IsEmpty ( $UpdateDict )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "CRUD" ; 
+
+   # ( "TableName" ; $TableName )
+& # ( "Method" ; "U" ) 
+& # ( "KeyField" ; $KeyField )
+& # ( "UpdateDict" ; $UpdateDict )
+& # ( "ReadFieldList" ; $ReadFieldList )
+& # ( "SearchRequests" ; 
+      # ( "[PrimaryKey]" ; $NewRecKeyFieldValue )
+   )
+
+& # ( "NoCommit" ; 1 )
+
+
+& # ( "UseWindowName" ; Get( WindowName ) )
+
+)]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$params</Name>
+  </Step>
+  <Step enable="True" id="1" name="Perform Script">
+    <Calculation>
+      <![CDATA[$params]]>
+</Calculation>
+    <Script id="2" name="CRUDFV ( params )"></Script>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[#R( "Result" ) = "Error"]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "Error while trying to perform the Update sub-script for this Create command, so the operation could not proceed. ERROR: " & #R( "ResultDescription" ) & "." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[#R( "ReturnDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ReturnDict</Name>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "CRUD" ; 
+
+   # ( "Table" ; $Table )
+& # ( "Method" ; "R" )
+& # ( "KeyField" ; FM_Name_ID ( $KeyField ; "F" ; Get ( FileName ) ; $Table ) )
+& # ( "SearchRequests" ; 
+      # ( "[PrimaryKey]" ; $NewRecKeyFieldValue )
+   )
+& # ( "UseWindowName" ; Get( WindowName ) )
+
+)]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$params</Name>
+  </Step>
+  <Step enable="True" id="1" name="Perform Script">
+    <Calculation>
+      <![CDATA[$params]]>
+</Calculation>
+    <Script id="2" name="CRUDFV ( params )"></Script>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[#R( "Result" ) = "Error"]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "Error while trying to perform the Update sub-script for this Create command, so the operation could not proceed. ERROR: " & #R( "ResultDescription" ) & "." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[#R( "ReturnDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ReturnDict</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "Result" ; "Success" ) 
+& # ( "FileName" ; Get ( FileName ) ) 
+& # ( "ScriptName" ; Get ( ScriptName ) ) 
+& # ( "ResultDescription" ; "Created record." ) 
+& #( "ReturnDict"; $ReturnDict )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$Method = "U"]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="False" id="1" name="Perform Script">
+    <FileReference id="1" name="a21_COMMONS">
+      <UniversalPathList>file:a21_COMMONS</UniversalPathList>
+    </FileReference>
+    <Calculation>
+      <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "TableID" ; $TableID ) & 
+# ( "HumanNameFieldList" ; DictListKeys ( $UpdateDict ) )]]>
+</Calculation>
+    <Script id="32794"></Script>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[#R( "Result" ) = "Error"]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; "Could not get the Criteria for the table '" & $TableName & "', so the operation could not proceed. ERROR: " & #R( "ResultDescription" ) & "." )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[#R ( "FieldDictList" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldDictList</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Now that you have your found set, loop through each one and return either the values specified or all values.</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[0]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$loopRecNum</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[$loopRecNum >= Get( FoundCount )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$loopRecNum + 1]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$loopRecNum</Name>
+  </Step>
+  <Step enable="True" id="16" name="Go to Record/Request/Page">
+    <NoInteract state="True"></NoInteract>
+    <RowPageLocation value="ByCalculation"></RowPageLocation>
+    <Calculation>
+      <![CDATA[$loopRecNum]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="True"></Set>
+  </Step>
+  <Step enable="True" id="133" name="Open Record/Request"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Get( LastError )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$openRecError</Name>
+  </Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="False"></Set>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$openRecError <> 0]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List( $updateFailureListKeys; GetField( $keyFieldName ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$updateFailureListKeys</Name>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Was ABLE to Open the record for editing:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Loop through all the fields and set them to their corresponding values</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$FieldDictList]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDictList_ReadTemp ; "FieldDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldDict</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictRemove ( $FieldDictList_ReadTemp ; "FieldDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[FM_Name_ID ( 
+    DictGet ( $FieldDict ; "TableID" ) & "::" & DictGet ( $FieldDict ; "FieldID" ) 
+  ; "T" 
+  ; Get ( FileName ) 
+  ; "" )
+
+& "::" &
+
+FM_Name_ID ( 
+    DictGet ( $FieldDict ; "TableID" ) & "::" & DictGet ( $FieldDict ; "FieldID" ) 
+  ; "F" 
+  ; Get ( FileName ) 
+  ; "" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldFullRef</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[DictGet( $FieldDict; "UseAlternateKey" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>This field was/is specified via its FieldID, so use that for the dictionary key, rather than the HumanName:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "FieldKey" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldKey</Name>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Use HumanName as the dictionary key:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "HumanName" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldKey</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $UpdateDict ; $fieldKey )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldUpdateValue</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[not Exact( GetField( $FieldFullref ); $FieldUpdateValue )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If the current value in the field is not EXACTLY the same as the incoming value, then change it:</Text>
+  </Step>
+  <Step enable="True" id="147" name="Set Field By Name">
+    <Result>
+      <Calculation>
+        <![CDATA[$FieldUpdateValue]]>
+</Calculation>
+    </Result>
+    <TargetName>
+      <Calculation>
+        <![CDATA[$FieldFullref]]>
+</Calculation>
+    </TargetName>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[not DictContains ( $FieldDictList_ReadTemp ; "FieldDict" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="75" name="Commit Records/Requests">
+    <NoInteract state="True"></NoInteract>
+    <Option state="False"></Option>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$Method = "U" or $Method = "R"]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>(don&apos;t need for Create, since that calls Update)</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>READ READ READ READ READ READ READ READ READ READ</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>READ READ READ READ READ READ READ READ READ READ</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>READ READ READ READ READ READ READ READ READ READ</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If a dictionary specifying to read all available criteria was set, note that for use below:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Grab all attributes from a21_COMMONS to return as the script result</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Now that you have one or more records, grab the field dictionary from a21_COMMONS to build your return dictionary</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>IMPORTANT: Script exptects a list (return-delimited) of Human Names to return. If &quot;ALL&quot; = True dictionary is specified, all CRITERIA are returned by the sub-script. If NOTHING is requested, then the [PrimaryKey] value for each record is returned.&#13;&#13;| &#13;Author: shockley &#13;Date: 11/18/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If &quot;ALL&quot; = True dictionary is specified, all CRITERIA are returned by the sub-script. &#13;&#13;| &#13;Author: shockley &#13;Date: 11/18/2011</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If NOTHING is requested, then the [PrimaryKey] value for each record is returned. &#13;&#13;| &#13;Author: shockley &#13;Date: 11/18/2011</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[IsEmpty( $ReadFieldList )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Nothing specified to read, so use [PrimaryKey] :</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[True]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$readPrimaryKey</Name>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>There ARE specified criteria to read, either a list, or the ALL=True:</Text>
+  </Step>
+  <Step enable="False" id="1" name="Perform Script">
+    <FileReference id="1" name="a21_COMMONS">
+      <UniversalPathList>file:a21_COMMONS</UniversalPathList>
+    </FileReference>
+    <Calculation>
+      <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "TableID" ; $TableID ) & 
+# ( "HumanNameFieldList" ; $ReadFieldList )]]>
+</Calculation>
+    <Script id="32794"></Script>
+  </Step>
+  <Step enable="False" id="68" name="If">
+    <Calculation>
+      <![CDATA[DictGet ( Get ( ScriptResult ) ; "Result" ) = "Error"]]>
+</Calculation>
+  </Step>
+  <Step enable="False" id="89" name="Comment">
+    <Text>If an error was encountered, exit the script with the result&#13;&#13;| &#13;Author: phillips &#13;Date: 11/14/2011</Text>
+  </Step>
+  <Step enable="False" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) & 
+# ( "ScriptName" ; Get ( ScriptName ) ) & 
+# ( "Result" ; "Error" ) & 
+# ( "ResultDescription" ; #R ( "ResultDescription" ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="False" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True   // Skip to clean-up section of script.]]>
+</Calculation>
+  </Step>
+  <Step enable="False" id="70" name="End If"></Step>
+  <Step enable="False" id="89" name="Comment">
+    <Text>Grab the item FieldDictList from the resulting Dictionary&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="False" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[#R ( "FieldDictList" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldDictList</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Build a new FieldDictList that includes the current field name (or calculation string), rather than evaluating for each record:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$FieldDictList]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[""]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldDictList_WithFieldNames</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDictList_ReadTemp ; "FieldDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldDict</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictRemove ( $fieldDictList_ReadTemp ; "FieldDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[IsEmpty( DictGet ( $FieldDict ; "FieldID" ) )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>NOT a normal field, so need to store the calc to be used in the loop over the records:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "CurrentEvalString" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$evalString</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[#( "FieldDict"
+   ; $FieldDict & #( "EvalString"; $evalString )
+   )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$newFieldDict</Name>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[     FM_Name_ID ( DictGet ( $FieldDict ; "TableID" ) ; "T" ; "" ; "" ) 
+  & "::" 
+  & FM_Name_ID ( DictGet ( $FieldDict ; "FieldID" ) ; "F" ; "" ; FM_Name_ID ( DictGet ( $FieldDict ; "TableID" ) ; "T" ; "" ; "" ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldName</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[#( "FieldDict"
+   ; $FieldDict & #( "FieldName"; $fieldName )
+   )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$newFieldDict</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List( $fieldDictList_WithFieldNames; $newFieldDict )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldDictList_WithFieldNames</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[not DictContains ( $fieldDictList_ReadTemp ; "FieldDict" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Now that you have your found set, loop through each one and return either the values specified or all values.</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>LOOP OVER RECORDS:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>LOOP OVER RECORDS:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>LOOP OVER RECORDS:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>LOOP OVER RECORDS:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[0]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$loopRecNum</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA["" 
+/* This will be a list of dictionaries with the requested response lists. It will look like this: 
+
+
+  # ( "Email"; "mphillips@nyhtc.org, dshockley@nyhtc.org" )
+& # ( "Gender"; "M¶M" )
+
+
+Note that there is no leading  | #( "ResponseLists"; |  for this - that will be added when the $result is set.
+
+*/]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ResponseLists</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[$loopRecNum >= Get( FoundCount )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$loopRecNum + 1]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$loopRecNum</Name>
+  </Step>
+  <Step enable="True" id="16" name="Go to Record/Request/Page">
+    <NoInteract state="True"></NoInteract>
+    <RowPageLocation value="ByCalculation"></RowPageLocation>
+    <Calculation>
+      <![CDATA[$loopRecNum]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Perform Operations</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>If a ReadResponseLists dictionary was passed in, need to build up the ResponseList for each requested:</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[not IsEmpty( $ReadResponseLists )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$ReadResponseLists]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ReadResponseLists_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[not DictContains( $ReadResponseLists_ReadTemp; "Response" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet( $ReadResponseLists_ReadTemp; "Response" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$oneReadResponse</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictRemove( $ReadResponseLists_ReadTemp; "Response" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ReadResponseLists_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet( $oneReadResponse; "CriterionKey" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$CriterionKey</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[If( IsEmpty( DictGet( $oneReadResponse; "Delimiter" ) )
+  ; "¶"
+  ; DictGet( $oneReadResponse; "Delimiter" ) 
+  )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$Delimiter</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Loop over fieldDictList_WithFieldNames to find the one for this response:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$fieldDictList_WithFieldNames]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[not DictContains ( $fieldDictList_ReadTemp; "FieldDict" )   
+  or 
+IsEmpty( $CriterionKey )  // No point in trying to build this if no CriterionKey specified.]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $fieldDictList_ReadTemp; "FieldDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldDict</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictRemove ( $fieldDictList_ReadTemp; "FieldDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[DictGet( $FieldDict; "HumanName" ) = $CriterionKey 
+ or 
+( DictGet( $FieldDict; "UseAlternateKey" ) = 1 and DictGet( $FieldDict; "FieldKey" ) = $CriterionKey )   // alternative key was used (i.e. the Field ID )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>This FieldDict includes the Criterion that is needed for this ResponseList:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[DictContains ( $FieldDict; "FieldName" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "FieldName" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$oneFieldName</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[GetField ( $oneFieldName )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldValue</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="125" name="Else If">
+    <Calculation>
+      <![CDATA[DictContains ( $FieldDict ; "EvalString" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "EvalString" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$oneCalc</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Evaluate ( $oneCalc )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldValue</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>ERROR? This criterion didn&apos;t ask for anything.</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[DictGet( $FieldDict; "UseAlternateKey" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>This field was/is specified via its FieldID, so use that for the key, rather than the HumanName:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "FieldKey" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldKey</Name>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Use HumanName as the key:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "HumanName" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldKey</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Now that we have the value of THIS criterion for THIS record, tack it on to the end of its respective ResponseList using its Delimiter.</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[IsEmpty( $fieldValue ) 
+ and 
+( DictGet( $oneReadResponse; "OmitBlanks" ) = 1 )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>There is no value to add and OmitBlanks was specified for this ResponseList (if not specified, the default is just to add on the BLANK anyway).</Text>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>This value is NOT empty, OR OmitBlanks was not specified (default is to add blanks anyway):</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet( $ResponseLists; $CriterionKey )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$prevResponseList</Name>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[PatternCount( $Delimiter & $prevResponseList & $Delimiter; $Delimiter & $fieldValue & $Delimiter ) 
+ and 
+( DictGet( $oneReadResponse; "UniqueValuesOnly" ) = 1 )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>This value is ALREADY in the list, and the UniqueValuesOnly switch was turned on, so do NOT add to list.</Text>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Add this value to the ResponseList and put back into the group of ResponseLists:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$prevResponseList 
+& If( IsEmpty( $prevResponseList ); ""; $Delimiter ) 
+& $fieldValue]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$newResponseList</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictReplace( $ResponseLists; $CriterionKey; $newResponseList )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ResponseLists</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>END - each FieldDict being checked for presence in requested ResponseList</Text>
+  </Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>END - each requested ResponseList</Text>
+  </Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[""]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldValuePairList</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$readPrimaryKey]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>the primary key should be included, even if not directly specified in the ReadFieldList:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[GetField( $keyFieldName )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$primaryKeyValue</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( $primaryKey_LABEL ; $primaryKeyValue )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$oneField</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List ( $fieldValuePairList ; 
+$oneField )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldValuePairList</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$fieldDictList_WithFieldNames]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Loop over each item in the FieldDictList dictionary and build the ResultDict dictionary with the values requested&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[not DictContains ( $fieldDictList_ReadTemp ; "FieldDict" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDictList_ReadTemp ; "FieldDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$FieldDict</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictRemove ( $fieldDictList_ReadTemp ; "FieldDict" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldDictList_ReadTemp</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[DictContains ( $FieldDict ; "FieldName" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "FieldName" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$oneFieldName</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[GetField ( $oneFieldName )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldValue</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="125" name="Else If">
+    <Calculation>
+      <![CDATA[DictContains ( $FieldDict ; "EvalString" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "EvalString" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$oneCalc</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Evaluate ( $oneCalc )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldValue</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>ERROR? This criterion didn&apos;t ask for anything.</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[DictGet( $FieldDict; "UseAlternateKey" )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>This field was/is specified via its FieldID, so use that for the key, rather than the HumanName:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "FieldKey" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldKey</Name>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Use HumanName as the key:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[DictGet ( $FieldDict ; "HumanName" )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldKey</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( $fieldKey ; $fieldValue )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$oneField</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>UseIdAsKey</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List ( $fieldValuePairList ; 
+$oneField )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$fieldValuePairList</Name>
+  </Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Now, put the list of field/value pairs into the ReturnDict:</Text>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List( $ReturnDict; 
+#( "Record"
+   ; $fieldValuePairList 
+   )
+)]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ReturnDict</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Go to next rec, exit after last</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[not IsEmpty( $KeyFieldValue ) 
+ and 
+$KeyFieldValue = GetField( $keyFieldName )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[If( IsEmpty( $updateFailureListKeys )
+  ; ""
+  ; #( "Error"
+      ; #( "ErrorType"; "Update Failure Record Locked" ) & # ( "ErrorPrimaryKeyList" ; $updateFailureListKeys ) 
+      )
+  )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$lockedErrorDict</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List( $ErrorDicts; $lockedErrorDict )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ErrorDicts</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "FileName" ; Get ( FileName ) ) 
+& # ( "ScriptName" ; Get ( ScriptName ) ) 
+& # ( "Result" ; "Success" ) 
+& # ( "ResultCount" ; Get ( FoundCount ) ) 
+& # ( "ReturnDict" ; $ReturnDict ) 
+& # ( "ResponseLists" ; $ResponseLists )
+& #( "ErrorDicts"; $ErrorDicts )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$Method = "D"]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Now that you have your found set, loop through each one and delete it</Text>
+  </Step>
+  <Step enable="True" id="16" name="Go to Record/Request/Page">
+    <NoInteract state="False"></NoInteract>
+    <RowPageLocation value="First"></RowPageLocation>
+  </Step>
+  <Step enable="True" id="71" name="Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="True"></Set>
+  </Step>
+  <Step enable="True" id="133" name="Open Record/Request"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Get( LastError )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$openRecError</Name>
+  </Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="False"></Set>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$openRecError <> 0]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List( $lockedListKeys; GetField( $keyFieldName ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$lockedListKeys</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$failCount + 1]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$failCount</Name>
+  </Step>
+  <Step enable="True" id="16" name="Go to Record/Request/Page">
+    <NoInteract state="False"></NoInteract>
+    <Exit state="False"></Exit>
+    <RowPageLocation value="Next"></RowPageLocation>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="True"></Set>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Delete the record without dialog&#13;&#13;| &#13;Author: phillips &#13;Date: 10/26/2011</Text>
+  </Step>
+  <Step enable="True" id="9" name="Delete Record/Request">
+    <NoInteract state="True"></NoInteract>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[Get( LastError )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$deleteError</Name>
+  </Step>
+  <Step enable="True" id="86" name="Set Error Capture">
+    <Set state="False"></Set>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[$deleteError <> 0]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List( $deleteFailureListKeys; GetField( $keyFieldName ) )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$deleteFailureListKeys</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$failCount + 1]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$failCount</Name>
+  </Step>
+  <Step enable="True" id="16" name="Go to Record/Request/Page">
+    <NoInteract state="False"></NoInteract>
+    <Exit state="False"></Exit>
+    <RowPageLocation value="Next"></RowPageLocation>
+  </Step>
+  <Step enable="True" id="69" name="Else"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[$deleteCount + 1]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$deleteCount</Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Stop looping over the records if we have either failed or succeeded on each one:</Text>
+  </Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[( $deleteCount + $failCount ) >= Get( FoundCount )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[If( IsEmpty( $lockedListKeys )
+  ; ""
+  ; #( "Error"
+      ; #( "ErrorType"; "Delete Failure Record Locked" ) & # ( "ErrorPrimaryKeyList" ; $lockedListKeys ) 
+      )
+  )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$lockedErrorDict</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List( $ErrorDicts; $lockedErrorDict )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ErrorDicts</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[If( IsEmpty( $deleteFailureListKeys )
+  ; ""
+  ; #( "Error"
+      ; #( "ErrorType"; "Delete Failure Not Locked" ) & # ( "ErrorPrimaryKeyList" ; $deleteFailureListKeys ) 
+      )
+  )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$deleteFailErrorDict</Name>
+  </Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[List( $ErrorDicts; $deleteFailErrorDict )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$ErrorDicts</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="141" name="Set Variable">
+    <Value>
+      <Calculation>
+        <![CDATA[# ( "Result" ; "Success" ) 
+& # ( "FileName" ; Get ( FileName ) ) 
+& # ( "ScriptName" ; Get ( ScriptName ) ) 
+& 
+# ( "ResultDescription"; "Deleted " & $deleteCount & " record" & If( $deleteCount = 1; ""; "s" ) & "." )
+& # ( "ErrorDicts" ; $ErrorDicts )]]>
+</Calculation>
+    </Value>
+    <Repetition>
+      <Calculation>
+        <![CDATA[1]]>
+</Calculation>
+    </Repetition>
+    <Name>$result</Name>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="72" name="Exit Loop If">
+    <Calculation>
+      <![CDATA[True // NEVER ACTUALLY LOOP - this "loop" was to allow script to jump to end]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="73" name="End Loop"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CLEAN-UP SECTION:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CLEAN-UP SECTION:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CLEAN-UP SECTION:</Text>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>CLOSE WINDOW, if needed:</Text>
+  </Step>
+  <Step enable="True" id="68" name="If">
+    <Calculation>
+      <![CDATA[not IsEmpty( $WindowName_TEMP )]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>Opened a new window, and it was for TEMP only (not desired for View method).</Text>
+  </Step>
+  <Step enable="True" id="121" name="Close Window">
+    <LimitToWindowsOfCurrentFile state="True"></LimitToWindowsOfCurrentFile>
+    <Window value="ByName"></Window>
+    <Name>
+      <Calculation>
+        <![CDATA[$WindowName_TEMP]]>
+</Calculation>
+    </Name>
+  </Step>
+  <Step enable="True" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment">
+    <Text>DISABLE: Should not need, since we used a different window (unless we specifically WANT the original window to show a new layout or found set).</Text>
+  </Step>
+  <Step enable="False" id="89" name="Comment">
+    <Text>Go to original layout, if needed:</Text>
+  </Step>
+  <Step enable="False" id="68" name="If">
+    <Calculation>
+      <![CDATA[$Method ≠ "V" and IsEmpty( $WindowName_TEMP )]]>
+</Calculation>
+  </Step>
+  <Step enable="False" id="6" name="Go to Layout">
+    <LayoutDestination value="OriginalLayout"></LayoutDestination>
+  </Step>
+  <Step enable="False" id="70" name="End If"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="103" name="Exit Script">
+    <Calculation>
+      <![CDATA[$result]]>
+</Calculation>
+  </Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+  <Step enable="True" id="89" name="Comment"></Step>
+</fmxmlsnippet>
