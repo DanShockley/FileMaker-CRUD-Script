@@ -1,6 +1,6 @@
 <fmxmlsnippet type="FMObjectList">
   <Step enable="True" id="89" name="Comment">
-    <Text>API Script for FileMaker Pro</Text>
+    <Text>API Script for FileMaker Pro 12</Text>
   </Step>
   <Step enable="True" id="89" name="Comment">
     <Text>written by Michael Phillips, Dan Shockley, and Andrew Morgan</Text>
